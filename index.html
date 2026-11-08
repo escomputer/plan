@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2027 IT 공기업·은행 수험 플래너</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=Gowun+Batang:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3F5F8; --sheet:#FFFFFF; --ink:#1C2740; --pencil:#5F6B7E; --line:#D7DDE6;
+  --hi:#F4DC4C; --hi-ink:#1C2740; --red:#C2342B; --blue:#2F5DA8; --green:#2E7D5B;
+  --chip-bg:#E8ECF2; --done:#9AA4B2;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A26; --sheet:#1C2333; --ink:#E6EAF2; --pencil:#9AA6BA; --line:#2E3850;
+    --hi:#D9C23A; --hi-ink:#141A26; --red:#F07067; --blue:#7FA6E8; --green:#6CC59C;
+    --chip-bg:#263048; --done:#5D6880;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A26; --sheet:#1C2333; --ink:#E6EAF2; --pencil:#9AA6BA; --line:#2E3850;
+  --hi:#D9C23A; --hi-ink:#141A26; --red:#F07067; --blue:#7FA6E8; --green:#6CC59C;
+  --chip-bg:#263048; --done:#5D6880;
+  color-scheme: dark;
+}
+:root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); }
+*,*::before,*::after{ box-sizing:inherit; }
+html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px); scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-size:16px; line-height:1.6;
+}
+body::before{ content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--sheet); }
+.wrap{ max-width:1120px; margin:0 auto; padding:0 20px; }
+h1,h2,h3{ font-family:"Gowun Batang", "Nanum Myeongjo", serif; font-weight:700; line-height:1.3; margin:0; }
+a{ color:var(--blue); }
+:focus-visible{ outline:3px solid var(--blue); outline-offset:2px; }
+
+/* top */
+.top{ padding:40px 0 28px; }
+.top h1{ font-size:clamp(28px,5vw,44px); }
+.top p{ margin:8px 0 0; color:var(--pencil); max-width:62ch; }
+
+/* d-day strip: the one bold element */
+.dday{ display:flex; gap:0; margin-top:28px; border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); overflow-x:auto; }
+.dday div{ flex:1 0 140px; padding:14px 16px; border-right:1px solid var(--line); }
+.dday div:last-child{ border-right:0; }
+.dday b{ display:block; font-family:"Gowun Batang", serif; font-size:34px; line-height:1.1; }
+.dday span{ font-size:14px; color:var(--pencil); }
+.dday .next b{ background:linear-gradient(transparent 55%, var(--hi) 55%); color:var(--ink); }
+.dday .past b{ color:var(--done); }
+
+/* nav */
+nav.tabs{ position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--sheet); border-bottom:1px solid var(--line); }
+nav.tabs .wrap{ display:flex; gap:4px; overflow-x:auto; }
+nav.tabs a{ padding:14px 14px; text-decoration:none; color:var(--pencil); white-space:nowrap; font-weight:500; }
+nav.tabs a:hover{ color:var(--ink); }
+
+section{ padding:48px 0 8px; }
+section > .wrap > h2{ font-size:28px; }
+.lead{ color:var(--pencil); margin:6px 0 24px; max-width:68ch; }
+
+/* tags */
+.tag{ display:inline-block; font-size:12px; font-weight:500; padding:1px 8px; border-radius:999px; margin-right:4px; background:var(--chip-bg); color:var(--ink); white-space:nowrap; }
+.tag.ct{ background:var(--blue); color:#fff; }
+.tag.es{ background:var(--red); color:#fff; }
+.tag.sv{ background:var(--green); color:#fff; }
+.tag.my{ background:var(--hi); color:var(--hi-ink); }
+.legend{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; font-size:14px; color:var(--pencil); align-items:center; }
+
+/* year calendar */
+.year{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+.month{ background:var(--sheet); border:1px solid var(--line); border-radius:6px; padding:18px 18px 14px; }
+.month.now{ border:2px solid var(--ink); }
+.month header{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+.month header h3{ font-size:30px; }
+.month header small{ color:var(--pencil); font-size:13px; }
+.month .phase{ font-weight:700; font-size:15px; margin:2px 0 8px; }
+.month ul{ margin:0 0 10px; padding-left:18px; font-size:14.5px; }
+.month li{ margin:2px 0; }
+.month h4{ margin:12px 0 6px; font-size:13px; color:var(--pencil); font-weight:500; border-top:1px dashed var(--line); padding-top:10px; }
+.month .rec{ list-style:none; padding:0; }
+.month .rec li{ margin:6px 0; font-size:14px; }
+.month .rec em{ font-style:normal; color:var(--pencil); font-size:13px; }
+
+/* daily grid */
+.cal{ background:var(--sheet); border:1px solid var(--line); border-radius:6px; margin-bottom:24px; overflow:hidden; }
+.cal > h3{ font-size:24px; padding:16px 18px; border-bottom:1px solid var(--line); }
+.grid7{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); }
+.dow{ font-size:13px; color:var(--pencil); padding:8px 10px; border-bottom:1px solid var(--line); }
+.day{ min-height:150px; border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:8px 9px; font-size:12.5px; line-height:1.45; }
+.day:nth-child(7n){ border-right:0; }
+.day.blank{ background:var(--paper); }
+.day.today{ box-shadow:inset 0 0 0 2px var(--ink); }
+.day .dn{ display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:14px; margin-bottom:4px; }
+.day .dn .wk{ display:none; font-weight:400; color:var(--pencil); }
+.day ul{ margin:0; padding-left:14px; }
+.day li{ margin:2px 0; }
+.day .ev{ display:block; margin:2px 0 4px; }
+.day label{ display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--pencil); cursor:pointer; }
+.day.done{ background:color-mix(in srgb, var(--green) 9%, var(--sheet)); }
+.day.done li{ color:var(--done); text-decoration:line-through; }
+@media (max-width:820px){
+  .grid7{ grid-template-columns:1fr; }
+  .dow,.day.blank{ display:none; }
+  .day{ min-height:0; border-right:0; font-size:14px; }
+  .day .dn .wk{ display:inline; }
+}
+
+/* routine tables */
+.tbl{ overflow-x:auto; background:var(--sheet); border:1px solid var(--line); border-radius:6px; margin-bottom:20px; }
+.tbl h3{ font-size:20px; padding:16px 18px 0; }
+.tbl p{ margin:4px 18px 10px; color:var(--pencil); font-size:14px; }
+table{ border-collapse:collapse; width:100%; min-width:560px; font-size:14.5px; }
+th,td{ text-align:left; vertical-align:top; padding:10px 14px; border-top:1px solid var(--line); }
+th{ width:110px; font-weight:700; white-space:nowrap; }
+
+/* subject guides */
+.guides{ display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px; }
+.guide{ background:var(--sheet); border:1px solid var(--line); border-radius:6px; padding:18px; }
+.guide h3{ font-size:22px; margin-bottom:4px; }
+.guide .goal{ color:var(--pencil); font-size:14px; margin:0 0 10px; }
+.guide ul,.guide ol{ padding-left:18px; margin:0; font-size:14.5px; }
+.guide li{ margin:4px 0; }
+.topics{ background:var(--sheet); border:1px solid var(--line); border-radius:6px; padding:18px; margin-top:16px; }
+.topics h3{ font-size:22px; }
+.topics dl{ display:grid; grid-template-columns:120px 1fr; gap:8px 16px; margin:12px 0 0; font-size:14.5px; }
+.topics dt{ font-weight:700; }
+.topics dd{ margin:0; }
+@media (max-width:600px){ .topics dl{ grid-template-columns:1fr; } .topics dd{ margin-bottom:8px; } }
+
+/* books */
+.books{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+.shelf{ background:var(--sheet); border:1px solid var(--line); border-radius:6px; padding:18px; }
+.shelf h3{ font-size:20px; margin-bottom:8px; }
+.shelf ul{ list-style:none; padding:0; margin:0; }
+.shelf li{ padding:8px 0; border-top:1px solid var(--line); font-size:14.5px; }
+.shelf li:first-child{ border-top:0; }
+.shelf li small{ display:block; color:var(--pencil); font-size:13px; }
+
+footer{ padding:40px 0 56px; color:var(--pencil); font-size:13.5px; }
+.themebtn{ background:none; border:1px solid var(--line); color:var(--pencil); border-radius:4px; padding:4px 10px; font:inherit; font-size:13px; cursor:pointer; margin-left:auto; align-self:center; }
+</style>
+</head>
+<body>
+
+<div class="wrap top">
+  <h1>2027 IT 공기업·은행 수험 플래너</h1>
+  <p>목표는 부산·대전·서울 근무 공공기관과 은행의 IT 직무야. 메인은 PSAT(=NCS), 전공(객관식+주관식), 코테 세 축이고, 어학이랑 한국사는 일찍 끝내고 넘어가.</p>
+  <div class="dday" id="dday"></div>
+</div>
+
+<nav class="tabs" aria-label="섹션">
+  <div class="wrap">
+    <a href="#calendar">월별 캘린더</a>
+    <a href="#daily">11~12월 일간 계획</a>
+    <a href="#routine">요일 루틴</a>
+    <a href="#subjects">과목별 공부법</a>
+    <a href="#books">교재</a>
+    <button class="themebtn" id="themebtn" type="button">화면 테마 바꾸기</button>
+  </div>
+</nav>
+
+<section id="calendar">
+  <div class="wrap">
+    <h2>월별 캘린더</h2>
+    <p class="lead">달마다 공부 목표, 그 아래에 그 달에 있는 채용 일정을 적었어. 채용 시기는 2026년 공고 기준 예상이라, 해당 월 초에 기관 채용 페이지랑 JOB-ALIO로 꼭 확인해.</p>
+    <div class="legend">
+      <span class="tag ct">코테</span><span class="tag es">논술</span><span class="tag sv">전공 서술</span><span class="tag">NCS·객관식</span><span class="tag my">내 시험</span>
+    </div>
+    <div class="year" id="year"></div>
+  </div>
+</section>
+
+<section id="daily">
+  <div class="wrap">
+    <h2>11~12월 일간 계획</h2>
+    <p class="lead">평일 2~3시간, 주말 6~8시간 기준이야. 끝낸 날은 체크해두면 이 브라우저에 저장돼.</p>
+    <div id="dailycal"></div>
+  </div>
+</section>
+
+<section id="routine">
+  <div class="wrap">
+    <h2>1월부터 요일 루틴</h2>
+    <p class="lead">단계마다 루틴이 바뀌어. 원서 마감 주간에는 평일 하루를 자소서로 바꿔도 돼.</p>
+    <div id="routines"></div>
+  </div>
+</section>
+
+<section id="subjects">
+  <div class="wrap">
+    <h2>과목별 공부법</h2>
+    <p class="lead">PSAT은 NCS 피셋형이랑 거의 같아서, 3월까지 PSAT을 메인으로 하면 공기업·은행 NCS도 같이 올라가.</p>
+    <div class="guides" id="guides"></div>
+    <div class="topics">
+      <h3>주관식 주제 리스트</h3>
+      <p class="goal" style="color:var(--pencil);font-size:14px;margin:4px 0 0">답안 틀은 항상 같게: ① 정의 → ② 동작 원리·구조 → ③ 장단점·비교 → ④ 실무·금융권 적용 사례. 주제당 20분, 손으로 A4 반 장.</p>
+      <dl id="topics"></dl>
+    </div>
+  </div>
+</section>
+
+<section id="books">
+  <div class="wrap">
+    <h2>교재</h2>
+    <p class="lead">자료해석에 돈이랑 시간을 몰고, 나머지는 무료 기출이랑 가진 책으로 버티는 구성이야.</p>
+    <div class="books" id="booklist"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">채용 일정은 예상치라 공고마다 바뀔 수 있어. ✔ 표시는 이미 지원해본 곳이야. 체크 기록은 이 브라우저에만 저장돼.</div>
+</footer>
+
+<script>
+(function(){
+  // ---------- theme ----------
+  var root = document.documentElement;
+  try{ var t = localStorage.getItem("planner-theme"); if(t){ root.setAttribute("data-theme", t); } }catch(e){}
+  document.getElementById("themebtn").addEventListener("click", function(){
+    var cur = root.getAttribute("data-theme");
+    var dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try{ localStorage.setItem("planner-theme", next); }catch(e){}
+  });
+
+  var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+  function d(y,m,dd){ return new Date(y, m-1, dd); }
+  function key(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
+  var WK = ["일","월","화","수","목","금","토"];
+
+  // ---------- D-day ----------
+  var exams = [
+    {name:"한능검 심화", date:d(2026,11,28), label:"11/28"},
+    {name:"토익 재응시", date:d(2027,1,16), label:"1월 중순 (회차 확인)"},
+    {name:"5급 PSAT 응시", date:d(2027,3,6), label:"3월 (공고 확인)"},
+    {name:"7급 PSAT", date:d(2027,7,17), label:"7월 (공고 확인)"},
+    {name:"A매치 필기", date:d(2027,10,16), label:"10월 셋째 주 예상"}
+  ];
+  var dd = document.getElementById("dday"), nextSet = false, html = "";
+  exams.forEach(function(x){
+    var diff = Math.round((x.date - TODAY)/86400000);
+    var cls = diff < 0 ? "past" : (!nextSet ? (nextSet = true, "next") : "");
+    var num = diff === 0 ? "D-DAY" : (diff > 0 ? "D-"+diff : "끝");
+    html += '<div class="'+cls+'"><b>'+num+'</b><span>'+x.name+'<br>'+x.label+'</span></div>';
+  });
+  dd.innerHTML = html;
+
+  // ---------- year calendar ----------
+  // tags: ct=코테, es=논술, sv=전공서술, n=NCS·객관식, my=내 시험
+  var T = {ct:'<span class="tag ct">코테</span>', es:'<span class="tag es">논술</span>', sv:'<span class="tag sv">전공 서술</span>', n:'<span class="tag">NCS·객관식</span>', my:'<span class="tag my">내 시험</span>'};
+  function tg(s){ return s.split(" ").map(function(k){return T[k]||"";}).join(""); }
+  var months = [
+    {y:2026,m:11, phase:"한능검 올인 → 1단계 시작",
+     goals:["11/28까지 한능검 심화 1급 (80점 이상)","코테는 하루 1문제로 감만 유지","11/29부터 1단계: PSAT 진단, 전공, 토익 가볍게"],
+     rec:[["재정정보원 필기 ✔","my","11/14~18, 결과 따라 11/30~ 면접"],["금감원 필기 결과 ✔","my","합격 시 면접 준비로 계획 조정"],["신협중앙회 결과 ✔","my","11/8 코테 응시분"],["한능검 심화","my","11/28"]]},
+    {y:2026,m:12, phase:"1단계: 기초 다지기",
+     goals:["PSAT 3영역 진단 → 자료해석 인강 시작","전공: 7·9급 컴일 기출 + 선지 설명 쓰기, 주관식 주 2편","토익 하루 30~60분, 1월 시험 접수","코테 Lv1~2 하루 1문제"],
+     rec:[["언론진흥재단 면접 ✔","my","12/8~9, 필기 합격 시"],["재정정보원 면접 ✔","my","~12/14, 필기 합격 시"]]},
+    {y:2027,m:1, phase:"토익 마무리 → PSAT 집중 전환",
+     goals:["1~2주차 토익 집중, 중순 응시","이후 PSAT 메인 (자료해석 시간 단축)","자소서 공통 문항 미리 쓰기","코테 주 3~4문제로 전환"],
+     rec:[["저축은행중앙회 원서","n","1~2월, 전산직군은 IT 관련 전공 요건 확인"],["새마을금고중앙회 일반직(IT)","n","1~3월, NCS + 금융경제상식 + 직무전공"],["NH농협은행 6급 상반기","n","1~3월 예상, 학교·학점 기재"],["5급 원서 접수","my","예년 2월 초, 공고 확인"]]},
+    {y:2027,m:2, phase:"PSAT 기출 회독 + 원서 시작",
+     goals:["PSAT 기출 회독, 실제 시간보다 10% 짧게","주관식 주 2편","코테: BFS/DFS, DP, 그리디, SQL"],
+     rec:[["코스콤 상반기","ct sv","2월 말~3월 초, 전공 필수1 + 선택2 서술"],["IBK기업은행 상반기","n","2~3월, 서류 사실상 적부"],["저축은행중앙회 마감","n","2월 중순 예상"]]},
+    {y:2027,m:3, phase:"PSAT 실전 + 원서 러시",
+     goals:["PSAT 실전 모의 주 2회","5급 PSAT 응시 (실전 경험용)","원서 많아도 코테 감은 유지"],
+     rec:[["5급 PSAT","my","3월 초 가능성, 날짜 확인"],["산업은행 상반기 (IT·AI)","sv es","3월 공고, 어학 최저기준"],["신한 디지털·ICT 수시","ct","3~4월, 알고리즘 + SQL"],["KB·하나·우리 상반기","ct","3~4월, IT 분리 여부 회차마다 다름"],["주금공 · 캠코","n","3~4월, 부산"],["K-water · 코레일 · 철도공단","n","3~4월, 대전"]]},
+    {y:2027,m:4, phase:"상반기 필기 시즌 1",
+     goals:["NCS: PSAT 실력 + 모듈형만 추가","전공 객관식 기출 반복","은행 코테 실전 세트 주 1회 (2시간 30분)","필기 1주 전엔 그 기관 과목만 몰아치기"],
+     rec:[["공기업 상반기 필기 몰림","n","주말마다 겹칠 수 있음"],["한국증권금융 상반기","sv","3~5월 예상, 어학 컷 높음"],["한국예탁결제원 ✔","ct sv es","4~5월이거나 하반기, IT 코테 있음"],["은행 코테","ct","신한·KB·하나·우리"]]},
+    {y:2027,m:5, phase:"상반기 필기 시즌 2",
+     goals:["주관식 주 3편으로 증가","기관별 기출 확인 후 맞춤 모의","자소서는 마감 1주 전 초안"],
+     rec:[["신협중앙회 상반기","ct n","5월 초 원서, 6월 초 필기"],["기술보증기금","n","2분기, 부산"],["한국남부발전 (ICT)","n","부산, 어학 정량"],["서울교통공사 상반기","n","열리는 해만, 정보통신"]]},
+    {y:2027,m:6, phase:"상반기 마무리",
+     goals:["상반기 오답·후기 정리","7급 PSAT 실전 모의 시작","주관식 60개 중 30개 완료 목표"],
+     rec:[["신협중앙회 필기","ct n","6월 초"],["주택도시보증공사(HUG)","n","6~7월, 관리 6급 전산·AI"]]},
+    {y:2027,m:7, phase:"7급 PSAT + 하반기 준비",
+     goals:["7급 PSAT 응시","논술 시작: 주 1~2편 (금융IT 트렌드)","주관식 주 4편"],
+     rec:[["7급 PSAT","my","7월, 공고 확인"],["주금공 · 캠코 하반기","n","7~8월"],["한국은행 원서 시작","sv es","7월 말~8월, 어학 고득점 유리"]]},
+    {y:2027,m:8, phase:"하반기 원서 시작",
+     goals:["논술 주 2편","기관별 전공 서술 기출","토스는 수은 지원 시 이때 확보"],
+     rec:[["KB국민 (IT, AI·플랫폼)","ct","8월 말~9월"],["우리은행 TECH","ct","8월 말~9월"],["IBK 디지털/IT","n","8월 말~9월"],["한은 · 산은 · 금감원 · 예보 · KRX","sv es","8~9월 원서"],["예탁결제원 ✔","ct sv es","상반기에 안 열렸으면 이때"]]},
+    {y:2027,m:9, phase:"원서 폭탄",
+     goals:["공부는 코테 유지 + 논술 + 기관별 모의만","원서는 우선순위 정해서 선택과 집중"],
+     rec:[["신한 · 하나 하반기","ct","9월"],["코스콤 하반기","ct sv","9월"],["금융결제원","sv","9월, 이듬해 입사"],["농협 전문 5급","n","9월"],["부산은행","n","9월, 통합직군이면 IT 별도 없음"],["한국증권금융 하반기","sv","9월"]]},
+    {y:2027,m:10, phase:"A매치 + 하반기 필기",
+     goals:["A매치는 한 곳만 골라 응시","필기 직전 1주는 그 기관 과목만"],
+     rec:[["A매치 필기","sv es","10월 셋째 주 토요일 예상"],["수출입은행 ✔","sv es","9~10월, 스피킹 필요할 수 있음"],["한국투자공사(KIC) ✔","es","9~10월, 영어 비중 큼"],["NH농협 6급 ✔ · 신협 하반기 ✔","ct n","10월"],["재정정보원 · 언론재단 · KLID ✔","n","10월, 서울"],["대전 공기업 하반기","n","K-water · 조폐공사 · 소진공 등"]]}
+  ];
+  var yr = document.getElementById("year"), yh = "";
+  months.forEach(function(mo){
+    var isNow = (TODAY.getFullYear()===mo.y && TODAY.getMonth()+1===mo.m);
+    yh += '<article class="month'+(isNow?' now':'')+'"><header><h3>'+mo.m+'월</h3><small>'+mo.y+'</small></header>';
+    yh += '<div class="phase">'+mo.phase+'</div><ul>'+mo.goals.map(function(g){return "<li>"+g+"</li>";}).join("")+'</ul>';
+    yh += '<h4>이달 채용 일정</h4><ul class="rec">'+mo.rec.map(function(r){return '<li>'+tg(r[1])+' '+r[0]+'<br><em>'+r[2]+'</em></li>';}).join("")+'</ul></article>';
+  });
+  yr.innerHTML = yh;
+
+  // ---------- daily plan (11/9 ~ 12/31) ----------
+  var START = d(2026,11,9), END = d(2026,12,31), HAN = d(2026,11,28);
+  function base(dt){
+    var w = dt.getDay();
+    if(dt < HAN){
+      if(w===6) return ["한능검 기출 2회분 시간 재고 풀기","오답 시대별 정리"];
+      if(w===0) return ["한능검 기출 1회분 + 취약 시대 정리","코테 2문제"];
+      return ["한능검 1시간 30분: 시대 1개 정리 + 기출 20문항","코테 1문제 (Lv1~2)"];
+    }
+    var lateDec = dt >= d(2026,12,14);
+    if(w===1||w===3||w===5) return ["토익 RC 40분 (Part 5·6 시간 재기)","PSAT 자료해석 1시간 (인강 1강 + 문제)","코테 1문제"];
+    if(w===2) return ["토익 LC 40분 (Part 3·4)","전공 1시간: 컴일 기출 20문항 + 선지 설명 쓰기"];
+    if(w===4) return ["토익 LC 40분","전공 40분 + 주관식 1편 (20분, 손으로)"];
+    if(w===6) return ["PSAT 기출 1영역 시간 재기 + 오답","전공 객관식 기출 2시간", lateDec ? "토익 실전 모의 1회" : "토익 Part 7 지문 10개"];
+    return ["코테 2~3문제","주관식 1편","주간 오답 정리 + 다음 주 계획"];
+  }
+  var special = {
+    "2026-11-14":{ev:"재정정보원 필기 기간 (11/14~18), 수험표 날짜 확인"},
+    "2026-11-26":{tasks:["한능검 빈출 연표 + 문화사 암기","코테 쉬기"]},
+    "2026-11-27":{tasks:["한능검 오답노트만 가볍게","일찍 자기"]},
+    "2026-11-28":{ev:"한능검 심화 시험", tasks:["시험 끝나면 푹 쉬기"]},
+    "2026-11-29":{tasks:["PSAT 기출 1회 진단 (3영역 시간 재기)","영역별 점수랑 시간 부족 지점 기록"]},
+    "2026-11-30":{tasks:["토익 실전 모의 1회 (풀세트)","파트별 약점 기록","코테 1문제"]},
+    "2026-12-01":{tasks:["자료해석 무료특강 2~3명 비교해서 강사 정하기","토익 LC 40분"]},
+    "2026-12-05":{ev:"교재 구매 끝내기"},
+    "2026-12-07":{ev:"1월 토익 시험 접수"},
+    "2026-12-08":{ev:"언론재단 면접 (필기 합격 시)"},
+    "2026-12-09":{ev:"언론재단 면접 (필기 합격 시)"},
+    "2026-12-25":{tasks:["쉬는 날 (코테 1문제만)"]},
+    "2026-12-31":{tasks:["12월 회고: PSAT 점수, 주관식 편수, 코테 문제 수","1월 토익 수험표 확인"]}
+  };
+  function loadDone(){ try{ return JSON.parse(localStorage.getItem("planner-done")||"{}"); }catch(e){ return {}; } }
+  function saveDone(o){ try{ localStorage.setItem("planner-done", JSON.stringify(o)); }catch(e){} }
+  var done = loadDone();
+  var host = document.getElementById("dailycal"), out = "";
+  [[2026,11],[2026,12]].forEach(function(ym){
+    var y=ym[0], m=ym[1];
+    out += '<div class="cal"><h3>'+y+'년 '+m+'월</h3><div class="grid7">';
+    ["월","화","수","목","금","토","일"].forEach(function(w){ out += '<div class="dow">'+w+'</div>'; });
+    var first = d(y,m,1), lead = (first.getDay()+6)%7, last = new Date(y,m,0).getDate();
+    for(var i=0;i<lead;i++) out += '<div class="day blank"></div>';
+    for(var n=1;n<=last;n++){
+      var dt = d(y,m,n), k = key(dt);
+      if(dt < START || dt > END){ out += '<div class="day blank"></div>'; continue; }
+      var sp = special[k]||{}, tasks = sp.tasks || base(dt);
+      var cls = "day" + (done[k]?" done":"") + (dt.getTime()===TODAY.getTime()?" today":"");
+      out += '<div class="'+cls+'" data-k="'+k+'"><div class="dn"><span>'+n+' <span class="wk">('+WK[dt.getDay()]+')</span></span>';
+      out += '<label><input type="checkbox" '+(done[k]?"checked":"")+' aria-label="'+m+'월 '+n+'일 완료"> 완료</label></div>';
+      if(sp.ev) out += '<span class="ev"><span class="tag my">'+sp.ev+'</span></span>';
+      out += '<ul>'+tasks.map(function(t){return "<li>"+t+"</li>";}).join("")+'</ul></div>';
+    }
+    var tail = (7 - ((lead+last)%7))%7;
+    for(var j=0;j<tail;j++) out += '<div class="day blank"></div>';
+    out += '</div></div>';
+  });
+  host.innerHTML = out;
+  host.addEventListener("change", function(e){
+    if(e.target.type!=="checkbox") return;
+    var cell = e.target.closest(".day"), k = cell.getAttribute("data-k");
+    if(e.target.checked){ done[k]=1; cell.classList.add("done"); } else { delete done[k]; cell.classList.remove("done"); }
+    saveDone(done);
+  });
+
+  // ---------- routines ----------
+  var routines = [
+    {t:"1월 1~2주: 토익 집중", n:"토익 시험 전 2주. PSAT·전공은 유지만 해.",
+     r:[["월·수·금","토익 RC 실전 1시간 + PSAT 자료해석 40분"],["화·목","토익 LC 실전 1시간 + 코테 1문제"],["토","토익 실전 모의 1회 + 오답, PSAT 1영역"],["일","토익 모의 1회 + 주관식 1편"]]},
+    {t:"1월 중순 ~ 3월: PSAT 집중", n:"5급 PSAT까지. 원서 마감 주는 일요일을 자소서로.",
+     r:[["월·수·금","PSAT 1시간 30분 (자료해석 매일 10문제 포함) + 코테 1문제"],["화·목","PSAT 1시간 + 전공 1시간 (목요일은 주관식 1편)"],["토","PSAT 실전 모의 1회 + 오답, 전공 2시간"],["일","코테 2~3문제 + 주간 오답 + 자소서"]]},
+    {t:"4월 ~ 6월: 상반기 필기 시즌", n:"필기 1주 전엔 그 기관 과목으로 통째로 바꿔.",
+     r:[["월·수","NCS 모의 (기관 출제사 맞춤) + 코테 1문제"],["화·목","전공 객관식 기출 + 주관식 1편"],["금","코테 실전 세트 (2시간 30분, 주 1회)"],["토","기관 맞춤 모의 또는 실제 필기"],["일","주관식 1편 + 자소서"]]},
+    {t:"7월: 7급 PSAT + 논술 시작", n:"7급 PSAT 끝나면 바로 하반기 모드.",
+     r:[["월·수·금","PSAT 실전 1영역 + 코테 1문제"],["화·목","논술 1편 (금융IT 트렌드) + 주관식 1편"],["토","PSAT 실전 모의 (시험 전) / 논술 2편 (시험 후)"],["일","주관식 1~2편 + 주간 정리"]]},
+    {t:"8월 ~ 10월: 하반기 본 시즌", n:"공부는 코테 유지 + 논술 + 전공 서술 + 기관별 모의만.",
+     r:[["월·수","전공 서술 기관 기출 1세트"],["화·목","논술 1편 + 코테 1문제"],["금","자소서"],["토","실제 필기 또는 기관 맞춤 모의"],["일","주관식 1편 + 원서 마감 체크"]]}
+  ];
+  document.getElementById("routines").innerHTML = routines.map(function(x){
+    return '<div class="tbl"><h3>'+x.t+'</h3><p>'+x.n+'</p><table><tbody>'+x.r.map(function(r){return "<tr><th>"+r[0]+"</th><td>"+r[1]+"</td></tr>";}).join("")+'</tbody></table></div>';
+  }).join("");
+
+  // ---------- guides ----------
+  var guides = [
+    {t:"한능검 심화", g:"11/28, 1급(80점 이상)", l:["기출이 전부야. 최근 10회분을 최소 1회독","틀린 문제는 시대별로 묶어서 정리","마지막 3일은 연표·문화사·근현대 빈출만","공기업 가점이나 우대 요소로 쓰는 곳이 많아"]},
+    {t:"토익", g:"855 → 900+, 1월 중순 1회로 끝내기", l:["12월은 하루 30~60분만, 1월 1~2주차에 집중","Part 7은 무조건 마지막 지문까지 다 푸는 연습","Part 5·6은 문제당 20초, 남은 시간을 Part 7로","LC Part 3·4는 문제 미리 읽기 습관","900이 확실히 의미 있는 곳은 한은·수은 정도, 나머지는 855로 충분"]},
+    {t:"PSAT (= NCS 피셋형)", g:"자료해석 시간 단축이 핵심", l:["자료해석 매일 10문제, 문항당 2분 → 1월까지 1분 30초","쉬운 선지부터 소거, 계산 선지는 마지막","보기 구조(ㄱ·ㄴ·ㄷ)로 답 후보 줄이기","정확한 계산 대신 어림셈·분수 비교","2분 넘으면 표시하고 넘기기","언어논리·상황판단은 기출만으로"]},
+    {t:"전공 객관식", g:"원래 강점, 유지 + 범위 넓히기", l:["7·9급 컴일, 전산직 기출 회독","문제 풀고 끝내지 말고 선지마다 왜 맞고 틀린지 한 줄씩","5급 과목에 없는 네트워크·보안·SW공학·컴구도 같이","필기 1주 전엔 그 기관 출제 범위만"]},
+    {t:"전공 주관식", g:"하반기까지 주제 60개 답안 쌓기", l:["12~3월 주 2편 → 4~6월 주 3편 → 7~10월 주 4편","정처기 실기 단답으로 서술 감 잡기","한은 기출(홈페이지 공개)로 실전 연습","금감원·예탁원·코스콤은 커뮤니티 복원 기출","쓴 답안은 첨삭 받기"]},
+    {t:"코테", g:"은행 코테 대비, 감이 끊기면 안 돼", l:["12월: 프로그래머스 Lv1~2 하루 1문제","1~3월: 주 3~4문제, BFS/DFS·DP·그리디·SQL","4월~: 실전 세트 주 1회 (4~5문제, 2시간 30분)","KB는 정수 오버플로 함정 주의","몰아치기로 안 되니 바쁜 주에도 주 2문제는 유지"]},
+    {t:"논술 (하반기)", g:"7월부터 시작", l:["금융IT 트렌드 주제로 주 1~2편","예탁원·KRX는 일반사회 제시문 분석형도 대비","서론 → 쟁점 2~3개 → 대안 → 결론 틀 고정","전공 주관식 주제랑 겹치게 고르면 한 번에 두 개"]}
+  ];
+  document.getElementById("guides").innerHTML = guides.map(function(x){
+    return '<div class="guide"><h3>'+x.t+'</h3><p class="goal">'+x.g+'</p><ul>'+x.l.map(function(i){return "<li>"+i+"</li>";}).join("")+'</ul></div>';
+  }).join("");
+
+  var topics = [
+    ["운영체제","프로세스 vs 스레드, CPU 스케줄링, 동기화(세마포어·뮤텍스·모니터), 교착상태, 가상메모리·페이지 교체"],
+    ["DB","정규화, 트랜잭션 ACID·격리수준, 동시성 제어(2PL·MVCC), 회복 기법, 인덱스(B+트리), RDB vs NoSQL"],
+    ["네트워크","OSI·TCP/IP, TCP 흐름·혼잡 제어, HTTPS·TLS, DNS, 라우팅"],
+    ["자료구조·알고리즘","시간복잡도, 정렬 비교, 해시 충돌 해결, 트리·그래프 탐색, DP"],
+    ["SW공학","개발 방법론(애자일 등), 테스트 기법, 디자인 패턴, MSA"],
+    ["보안","대칭·비대칭 암호, 해시·전자서명·PKI, SQL Injection·XSS·DDoS, 제로트러스트"],
+    ["금융IT 트렌드","클라우드, 망분리 완화, AI 거버넌스, 마이데이터, 블록체인·STO (논술이랑 겹침)"]
+  ];
+  document.getElementById("topics").innerHTML = topics.map(function(x){ return "<dt>"+x[0]+"</dt><dd>"+x[1]+"</dd>"; }).join("");
+
+  // ---------- books ----------
+  var shelves = [
+    {t:"사야 할 것", l:[
+      ["자료해석 인강 1개 + 그 강사 교재","공단기 신헌·김승환, 패스온패스 조훈 중 무료특강 듣고 하나만"],
+      ["토익 실전 모의고사 1권","ETS 공식 기출 계열, 12월 셋째 주부터 주말마다"],
+      ["정처기 실기 기출문제집","가진 시나공이 필기용이면 실기 기출만, 무료 복원본으로 대체 가능"]]},
+    {t:"선택 (필요할 때만)", l:[
+      ["시대에듀 5급 PSAT 전과목 단기완성+필수기출 300제","언어논리·상황판단 보충이 필요하면"],
+      ["NCS 모듈형 기관별 모의고사","4월 필기 기관 정해지면 그 출제사 걸로"]]},
+    {t:"무료", l:[
+      ["5급·7급 PSAT 기출","사이버국가고시센터"],
+      ["한능검 기출","한국사능력검정시험 홈페이지"],
+      ["한국은행 컴퓨터공학 기출","한국은행 채용 홈페이지"],
+      ["코테","프로그래머스"]]},
+    {t:"이미 있는 것", l:[
+      ["7급·9급 컴퓨터일반 기출","객관식 + 선지 설명 쓰기용"],
+      ["전산직 기출문제","객관식 회독"],
+      ["시나공 정보처리기사 기본서","주관식 쓸 때 개념 확인용"]]}
+  ];
+  document.getElementById("booklist").innerHTML = shelves.map(function(s){
+    return '<div class="shelf"><h3>'+s.t+'</h3><ul>'+s.l.map(function(b){return "<li>"+b[0]+"<small>"+b[1]+"</small></li>";}).join("")+'</ul></div>';
+  }).join("");
+})();
+</script>
+</body>
+</html>
